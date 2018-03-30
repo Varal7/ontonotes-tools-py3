@@ -75,7 +75,7 @@ Functions:
 """
 
 #---- standard library imports ----#
-from __future__ import with_statement
+
 
 import string
 import sys
@@ -88,7 +88,7 @@ import zlib
 import gzip
 import pprint
 import traceback
-import StringIO
+import io
 import codecs
 from on.common.util import mkdirs, make_fname_safe, output_file_name, mkdirs, unicode2buckwalter, listdir_both
 
@@ -148,7 +148,7 @@ def warning(warning_string, verbosity=0):
     """ print warning string depending on the value of on.common.log.VERBOSITY """
 
     if(verbosity <= VERBOSITY):
-        output_stream.write(u"""
+        output_stream.write("""
 
 --------------------------------------------------------------------------------
                                       WARNING
@@ -172,10 +172,10 @@ def debug(debug_object, debug_flag=DEBUG, verbosity=MAX_VERBOSITY, nl=False):
 
 
 def show_locals(local_hash):
-    print "\n"
-    for key in local_hash.keys():
-        print key.rjust(50), ": ", str(local_hash[key])[0:100]
-        print
+    print("\n")
+    for key in list(local_hash.keys()):
+        print(key.rjust(50), ": ", str(local_hash[key])[0:100])
+        print()
 
 def bad_data(complaint_target, complaint_name, data_pointer, *r_msgs,  **kw_msgs):
     """ Record that the data in 'data_pointer' is invalid
@@ -267,7 +267,7 @@ def report(report_name, report_msg_title, *report_msgs, **kw_msgs):
         for report_msg in report_msgs:
             lines += report_msg.split('\n')
 
-        for report_key, report_msg in kw_msgs.iteritems():
+        for report_key, report_msg in kw_msgs.items():
             for report_msg in str(report_msg).split("\n"):
                 lines.append("%s: %s" % (report_key, report_msg))
 
@@ -385,10 +385,10 @@ ERRS = {"universal":     ("00",
 
 
 # sanity check ERRS
-for category, (ignore, errdict) in ERRS.items():
+for category, (ignore, errdict) in list(ERRS.items()):
     warnings = [] # (errval, short_errno, errname, errexpl)
     errors = [] # (errval, short_errno, errname, errexpl)
-    for errname, (short_errno, errexpl, errval) in errdict.items():
+    for errname, (short_errno, errexpl, errval) in list(errdict.items()):
         x = (errval, short_errno, errname, errexpl)
         if short_errno[0] == "5":
             errors.append(x)
@@ -446,7 +446,7 @@ def _write_reject(where, dropped_from, errcomms, opcode, rejection):
             try:
                 fname_base = output_file_name(document_id, data_sort)
             except IndexError:
-                print document_id, data_sort
+                print(document_id, data_sort)
                 raise
             try:
                 mkdirs(os.path.dirname(fname_base))
@@ -472,7 +472,7 @@ def _write_reject(where, dropped_from, errcomms, opcode, rejection):
                         try:
                             line = indent + line.replace("\n", "\n" + indent + "   ")
                         except Exception:
-                            print "%r" % line
+                            print("%r" % line)
                             raise
                         for subline in line.split("\n"):
                             outf.write("; %s\n" % subline)
@@ -501,7 +501,7 @@ def info(text, newline=True):
 def print_trace():
     """ print the traceback to stderr """
 
-    sbuf = StringIO.StringIO()
+    sbuf = io.StringIO()
     traceback.print_exc(file = sbuf)
     excval = sbuf.getvalue()
     sys.stderr.write(excval)

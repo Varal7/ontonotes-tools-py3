@@ -155,7 +155,7 @@ Classes:
 """
 
 #---- standard python imports ----#
-from __future__ import with_statement
+
 
 import operator
 import os.path
@@ -746,11 +746,11 @@ class abstract_node(abstract_proposition_bit):
             a_subtree = a_tree.get_subtree_by_span(new_first_leaf, new_last_leaf)
         else:
             if a_tree.get_subtree_by_span(first_leaf, last_leaf):
-                print >>sys.stderr, first_leaf
-                print >>sys.stderr, last_leaf
-                print >>sys.stderr, a_tree.get_subtree_by_span(first_leaf, last_leaf)
-                print >>sys.stderr, new_first_leaf
-                print >>sys.stderr, new_last_leaf
+                print(first_leaf, file=sys.stderr)
+                print(last_leaf, file=sys.stderr)
+                print(a_tree.get_subtree_by_span(first_leaf, last_leaf), file=sys.stderr)
+                print(new_first_leaf, file=sys.stderr)
+                print(new_last_leaf, file=sys.stderr)
             assert not a_tree.get_subtree_by_span(first_leaf, last_leaf)
             adderr("nosubtree",
                    "from_subtree:\n%s" % self.subtree.pretty_print(),
@@ -1802,8 +1802,8 @@ class argument_analogue(abstract_analogue):
             is_r = not any(subtree_equal(a_subtree, core_subtree)
                            for a_subtree in argument_sub_list)
             if type(argument_sub_list) != type([]):
-                print >>sys.stderr, self.enc_self
-                print >>sys.stderr, argument_sub_list
+                print(self.enc_self, file=sys.stderr)
+                print(argument_sub_list, file=sys.stderr)
                 raise Exeption("err")
 
             for a_subtree in argument_sub_list:
@@ -2252,7 +2252,7 @@ class proposition(object):
 
                 try:
                     a_argument_analogue = argument_analogue(enc_argument_analogue, self)
-                except BadArgumentTypeException, bate:
+                except BadArgumentTypeException as bate:
                     return reject("badargtype",
                                   "bad argument type: %s" % bate,
                                   "argument: %s" % enc_argument_analogue)
@@ -2309,7 +2309,7 @@ class proposition(object):
 
                 # do secondary relaxed check allowing for one off height
                 if not found_connection_flag:
-                    print >>sys.stderr, "performing secondary check ..."
+                    print("performing secondary check ...", file=sys.stderr)
 
                     for a_node_pointer in enc_link_node_pointers.split("*"):
                         if(a_node_pointer.endswith(":0")):
@@ -2322,7 +2322,7 @@ class proposition(object):
 
                         if b_node_pointer in self.raw_argument_node_pointers_hash:
                             found_connection_flag = True
-                            print >>sys.stderr, "found anchor during secondary check ... [%s]" % (self.enc_prop)
+                            print("found anchor during secondary check ... [%s]" % (self.enc_prop), file=sys.stderr)
                             the_respective_argument_analogue = self.raw_argument_node_pointers_hash[b_node_pointer]
                             break
 
@@ -2406,7 +2406,7 @@ class proposition(object):
             # connecting A and B
 
             if not ratings:
-                print >>sys.stderr, self.enc_prop
+                print(self.enc_prop, file=sys.stderr)
                 #FIXME: commenting the following because it crashes on a few propositions (chinese/tc)
                 #on.common.log.report("proposition", "A*B not linked when should be",
                 #                     tree=a_argument[0].subtree.get_root().pretty_print()
@@ -2549,7 +2549,7 @@ class proposition(object):
                 else: # link
                     seen_link = True
 
-                    for find, replace in modify_links_by.iteritems():
+                    for find, replace in modify_links_by.items():
                         for a_link in a_thing:
                             for a_link_node in a_link:
                                 if same_subtree(a_link_node.subtree, find):
@@ -3154,7 +3154,7 @@ class proposition_document:
         if prop2sgml:
             ext += "2sgml"
 
-        print >>sys.stderr, self.document_id
+        print(self.document_id, file=sys.stderr)
         with codecs.open(on.common.util.output_file_name(self.document_id, ext, out_dir), "w", "utf-8") as f:
             if prop2sgml:
                 if not self.tree_document:
@@ -3353,19 +3353,19 @@ class proposition_bank(abstract_bank):
 
                 try:
                     frame_set_file_string = frame_set_file.read()
-                except UnicodeDecodeError, e:
+                except UnicodeDecodeError as e:
                     continue
 
                 try:
                     a_lemma = re.findall("<id>\s+(.*?)\s+</id>", frame_set_file_string)[0]
-                except Exception, e:
+                except Exception as e:
                     continue
             else:
                 on.common.log.error("please change this code to address the new langauge (given %s)" % language_id, False)
                 break
 
             lemma_pos = "%s-%s" % (a_lemma, prop_type)
-            if lemma_hash and not lemma_hash.has_key(a_lemma):
+            if lemma_hash and a_lemma not in lemma_hash:
                 on.common.log.debug("skipping %s ...." % (a_lemma), on.common.log.DEBUG, on.common.log.MAX_VERBOSITY)
                 continue
             else:
@@ -3385,7 +3385,7 @@ class proposition_bank(abstract_bank):
                         a_frame_set.lemma = a_lemma
 
                     frame_set_hash[lemma_pos] = a_frame_set
-                except Exception, e:
+                except Exception as e:
                     on.common.log.report("prop", "found some problem processing frame file", fname=frame_set_file_name)
 
         sys.stderr.write("\n")
@@ -3621,7 +3621,7 @@ class proposition_bank(abstract_bank):
                 try:
                     a_proposition.enrich_tree(a_tree)
                 except Exception:
-                    print old_enc_prop
+                    print(old_enc_prop)
                     raise
 
                 self.check_proposition(a_proposition, ignore_errors=ignore_errors)
@@ -3666,7 +3666,7 @@ insert into proposition_bank
     @classmethod
     def write_frame_set_hash_to_db(cls, a_frame_set_hash, a_cursor):
         if a_frame_set_hash and not is_not_loaded(a_frame_set_hash) and not is_db_ref(a_frame_set_hash):
-            for a_frame_set in a_frame_set_hash.itervalues():
+            for a_frame_set in a_frame_set_hash.values():
                 a_frame_set.write_to_db(a_cursor)
 
 

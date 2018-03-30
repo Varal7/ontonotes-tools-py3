@@ -7,7 +7,7 @@ look at :func:`callisto_to_chain_lists` .
 
 """
 
-from __future__ import with_statement
+
 import os
 import re
 import codecs
@@ -60,7 +60,7 @@ def apf_to_callisto(fname_apf, fname_source, out_xml=None, munge_primary_mention
 
     try:
         et = ElementTree.parse(fname_apf)
-    except Exception, e:
+    except Exception as e:
         raise InvalidApfException(fname_apf, "not valid xml: %s" % (e.args, ))
 
     if type(fname_source) == type(""):
@@ -202,7 +202,7 @@ def apf_to_callisto(fname_apf, fname_source, out_xml=None, munge_primary_mention
     w('  </SimpleSignal>\n')
     w('  <AnchorSet containedType="text-point">\n')
 
-    for anchor_id, anchor_char in sorted(anchors.iteritems()):
+    for anchor_id, anchor_char in sorted(anchors.items()):
         w('    <Anchor id="%s" type="text-point">\n' % anchor_id)
         w('      <Parameter type="char" unit="NULL_UNIT" role="char">%s</Parameter>\n' % anchor_char)
         w('      <SignalRef xlink:href="#Sig6" role="text" xlink:type="simple"/>\n')
@@ -213,7 +213,7 @@ def apf_to_callisto(fname_apf, fname_source, out_xml=None, munge_primary_mention
     w('  <RegionSet containedType="ace_argument_region"/>\n')
 
     w('  <RegionSet containedType="ace_entity_region">\n')
-    for region_id, annotation_ids in sorted(ace_entity_regions.iteritems()):
+    for region_id, annotation_ids in sorted(ace_entity_regions.items()):
         w('    <Region id="%s" type="ace_entity_region">\n' % region_id)
         w('      <AnnotationRef xlink:href="#%s" role="primary-mention" xlink:type="simple"/>\n' % annotation_ids[0])
         w('      <AnnotationRefSet containedType="ace_entity-mention">\n')
@@ -233,7 +233,7 @@ def apf_to_callisto(fname_apf, fname_source, out_xml=None, munge_primary_mention
     w('  <RegionSet containedType="ace_relation_region"/>\n')
 
     w('  <RegionSet containedType="head-full">\n')
-    for region_id, (full_region_id, head_region_id) in sorted(head_full_regions.iteritems()):
+    for region_id, (full_region_id, head_region_id) in sorted(head_full_regions.items()):
         w('    <Region id="%s" type="head-full">\n' % region_id)
         w('      <RegionRef xlink:href="#%s" role="full" xlink:type="simple"/>\n' % full_region_id)
         w('      <RegionRef xlink:href="#%s" role="head" xlink:type="simple"/>\n' % head_region_id)
@@ -241,7 +241,7 @@ def apf_to_callisto(fname_apf, fname_source, out_xml=None, munge_primary_mention
     w('  </RegionSet>\n')
 
     w('  <RegionSet containedType="text-extent">\n')
-    for region_id, (start_anchor, end_anchor) in sorted(text_extent_regions.iteritems()):
+    for region_id, (start_anchor, end_anchor) in sorted(text_extent_regions.items()):
         w('    <Region id="%s" type="text-extent">\n' % region_id)
         w('      <AnchorRef xlink:href="#%s" role="end" xlink:type="simple"/>\n' % end_anchor)
         w('      <AnchorRef xlink:href="#%s" role="start" xlink:type="simple"/>\n' % start_anchor)
@@ -261,7 +261,7 @@ def apf_to_callisto(fname_apf, fname_source, out_xml=None, munge_primary_mention
             else:
                 w('>%s</Parameter>\n' % value)
 
-    for annotation_id, (ace_entity_mention_region_id, params) in sorted(ace_entity_annotations.iteritems()):
+    for annotation_id, (ace_entity_mention_region_id, params) in sorted(ace_entity_annotations.items()):
         w('      <Annotation id="%s" type="ace_entity">\n' % annotation_id)
         w('        <RegionRef xlink:href="#%s" role="ace_entity-mentions" xlink:type="simple"/>\n' % ace_entity_mention_region_id)
         w('        <Content type="ace_entity_content">\n')
@@ -274,7 +274,7 @@ def apf_to_callisto(fname_apf, fname_source, out_xml=None, munge_primary_mention
 
     w('    <AnnotationSet containedType="ace_entity-mention">\n')
 
-    for annotation_id, (head_full_region_id, params) in sorted(head_full_annotations.iteritems()):
+    for annotation_id, (head_full_region_id, params) in sorted(head_full_annotations.items()):
         w('      <Annotation id="%s" type="ace_entity-mention">\n' % annotation_id)
         w('        <RegionRef xlink:href="#%s" role="head-full" xlink:type="simple"/>\n' % head_full_region_id)
         w('        <Content type="ace_entity-mention_content">\n')
@@ -330,7 +330,7 @@ def callisto_to_chain_lists(fname, include_metadata=True):
 
     e_lists = []
 
-    for primary_annotation, all_annotations in sorted(primary_to_all.iteritems()):
+    for primary_annotation, all_annotations in sorted(primary_to_all.items()):
 
         primary_id = ace_entity_mentions[primary_annotation]["id"]
 
@@ -407,7 +407,7 @@ def callisto_to_apf(fname, out_apf=None, out_source=None):
     w('\n')
     w('<source_file URI="file://%s" SOURCE="unknown" TYPE="text" VERSION="5.0" AUTHOR="unknown" ENCODING="UTF-8">\n' % fname)
     w('  <document DOCID="%s">\n' % document_id)
-    for primary_annotation, all_annotations in sorted(primary_to_all.iteritems()):
+    for primary_annotation, all_annotations in sorted(primary_to_all.items()):
         primary_id = ace_entity_mentions[primary_annotation]["id"]
 
         if "-" in primary_id and primary_id.split("-")[-1].isdigit():
@@ -435,8 +435,8 @@ def callisto_to_apf(fname, out_apf=None, out_source=None):
             region = ace_entity_mentions[a_annotation]["region"]
             region = fulls.get(region, region)
             if region not in text_extents:
-                print "  ".join(sorted(text_extents.keys()))
-                print region
+                print("  ".join(sorted(text_extents.keys())))
+                print(region)
             start_anchor, end_anchor = text_extents[region]
             start_char, end_char = anchors[start_anchor], anchors[end_anchor]
             charseq = '          <charseq START="%s" END="%s">%s</charseq>\n' % (
@@ -450,7 +450,7 @@ def callisto_to_apf(fname, out_apf=None, out_source=None):
                 w('        </head>\n')
                 w('      </entity_mention>\n')
             except UnicodeEncodeError:
-                print "%r" % charseq
+                print("%r" % charseq)
                 raise
 
         w('    </entity>\n')
@@ -548,7 +548,7 @@ def parse_callisto_xml(fname, stop_at_mentions=False):
         try:
             ref = e.attrib["{%s}href" % PREPEND_B]
         except Exception:
-            print e, e.attrib
+            print(e, e.attrib)
             raise
 
         if ref.startswith("#"):
@@ -594,11 +594,11 @@ def parse_callisto_xml(fname, stop_at_mentions=False):
     try:
         source_text_raw = get_source_text(simple_signal).decode("utf8")
     except UnicodeDecodeError:
-        print "-"*70
-        print "Raw source text:"
-        print "----------------"
-        print "%r"% list(enumerate(get_source_text(simple_signal)))
-        print "-"*70
+        print("-"*70)
+        print("Raw source text:")
+        print("----------------")
+        print("%r"% list(enumerate(get_source_text(simple_signal))))
+        print("-"*70)
         raise
 
 
@@ -692,7 +692,7 @@ def parse_callisto_xml(fname, stop_at_mentions=False):
 
     if name_annotations:
         names = []
-        for region, type in name_annotations.iteritems():
+        for region, type in name_annotations.items():
             start, end = text_extents[region]
 
             names.append([anchors[start], anchors[end], type])
@@ -703,7 +703,7 @@ def parse_callisto_xml(fname, stop_at_mentions=False):
 
     elif primary_to_all:
         corefs = [] # list of [ start, end, id, type, subtype ]
-        for primary_annotation, all_annotations in primary_to_all.iteritems():
+        for primary_annotation, all_annotations in primary_to_all.items():
 
             if len(all_annotations) == 1:
                 continue
@@ -848,7 +848,7 @@ def callisto_to_sgml(fname, out_sgml=None, buckit=False, language="unknown", wra
 
         try:
             n_text, num_fixed = desubtokenize_annotations(n_text, add_offset_notations=True)
-        except Exception, e:
+        except Exception as e:
             raise DeSubtokenizationFailedException(fname, e)
 
         if buckit:

@@ -18,7 +18,7 @@ def start():
         raise Exception("Failed to load anything")
 
     for a_subcorpus in a_ontonotes:
-        for a_bank in a_subcorpus.itervalues():
+        for a_bank in a_subcorpus.values():
             a_bank.dump_view(a_cursor, out_dir)
 
 if __name__ == "__main__":

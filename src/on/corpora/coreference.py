@@ -112,7 +112,7 @@ Classes:
 """
 
 #---- standard python imports ----#
-from __future__ import with_statement
+
 
 import operator
 import os.path
@@ -444,7 +444,7 @@ default character set utf8;
 
         try:
             cursor.executemany("%s" % (self.__class__.sql_insert_statement), data)
-        except MySQLdb.Error, e:
+        except MySQLdb.Error as e:
             on.common.log.report("coreference", "error writing coreference link to database",
                                  link=self, error=e )
 
@@ -626,7 +626,7 @@ class coreference_document:
 
 
 
-        enc_doc_string = enc_doc_string.replace(u'\ufeff', "")
+        enc_doc_string = enc_doc_string.replace('\ufeff', "")
 
         self.extension = extension
         self.coreference_chain_hash = {}
@@ -686,7 +686,7 @@ class coreference_document:
                 try:
                     enc_doc_string, _ = on.common.util.desubtokenize_annotations(enc_doc_string, add_offset_notations=True)
                 except Exception:
-                    print enc_doc_string
+                    print(enc_doc_string)
                     raise
 
                 #print enc_doc_string
@@ -703,11 +703,11 @@ class coreference_document:
 
             #---- sanity check ----#
             if( self.doc_no is None or re.sub(".mrg", "", self.doc_no.split("@")[0]) != self.document_id.split("@")[0]):
-                print >>sys.stderr, ""
-                print >>sys.stderr, self.doc_no
-                print >>sys.stderr, self.document_id
-                print >>sys.stderr, self.doc_no, self.document_id.split("@")[0].split("/")[-1]
-                print >>sys.stderr, self.doc_no, self.document_id
+                print("", file=sys.stderr)
+                print(self.doc_no, file=sys.stderr)
+                print(self.document_id, file=sys.stderr)
+                print(self.doc_no, self.document_id.split("@")[0].split("/")[-1], file=sys.stderr)
+                print(self.doc_no, self.document_id, file=sys.stderr)
                 on.common.log.warning("doc_no (%s) does not match with document_id (%s)" % (self.doc_no, self.document_id), on.common.log.MAX_VERBOSITY)
 
             enc_doc_string = "\n".join([x.strip() for x in enc_doc_string.split("\n") if x.strip()])
@@ -971,7 +971,7 @@ class coreference_document:
     def delete_singleton_links(self):
 
         #---- for each coreference chain in the list of chains in this document ----#
-        for coreference_chain_id in self.coreference_chain_hash.keys():
+        for coreference_chain_id in list(self.coreference_chain_hash.keys()):
             coref_chain = self.coreference_chain_hash[coreference_chain_id]
 
             #---- this separate "if" statement takes care of initially lone links, or lone links formed after deletion of overlapping links ----#
@@ -1016,7 +1016,7 @@ class coreference_document:
                             (len(self.coreference_chain_hash)),
                             on.common.log.DEBUG, on.common.log.MAX_VERBOSITY)
         #---- for each coreference chain in the list of chains in this document ----#
-        for coreference_chain_id in self.coreference_chain_hash.keys():
+        for coreference_chain_id in list(self.coreference_chain_hash.keys()):
             coref_chain = self.coreference_chain_hash[coreference_chain_id]
 
             #---- lets print the chain before filtering ----#
@@ -1078,7 +1078,7 @@ class coreference_document:
 
 
     def write_to_db(self, cursor):
-        for a_coreference_chain in self.coreference_chain_hash.itervalues():
+        for a_coreference_chain in self.coreference_chain_hash.values():
             if a_coreference_chain.valid:
                 a_coreference_chain.write_to_db(cursor)
 
@@ -1157,7 +1157,7 @@ class coreference_document:
         def copy_coref_chains():
             to_coref_doc.sentence_tokens_list = list(self.tree_document.sentence_tokens_as_lists(make_sgml_safe=True))
 
-            for coref_chain_id, coref_chain in self.coreference_chain_hash.iteritems():
+            for coref_chain_id, coref_chain in self.coreference_chain_hash.items():
                 if coref_chain.valid:
                     to_coref_doc.coreference_chain_hash[coref_chain_id] = coref_chain.copy_to_different_trees(
                         alignment_from_to, self, to_coref_doc)
@@ -1197,13 +1197,15 @@ class coreference_document:
             raise Exception("Coreference documents may be dumped only from the database or after enrichment")
 
 
-        def coref_link_sorter( (link_a, id_a), (link_b, id_b) ):
+        def coref_link_sorter(xxx_todo_changeme, xxx_todo_changeme1 ):
 
             # all smallest first
             #   sort first by sentence
             #   then by start token index
             #   then by end token index
 
+            (link_a, id_a) = xxx_todo_changeme
+            (link_b, id_b) = xxx_todo_changeme1
             for compare in ['sentence_index', 'start_token_index', 'end_token_index']:
                 a_compare = int(getattr(link_a, compare))
                 b_compare = int(getattr(link_b, compare))
@@ -1213,7 +1215,7 @@ class coreference_document:
             return 0
 
         coref_links_and_ids = [(cl, cc_id)
-                               for (cc_id, cc) in self.coreference_chain_hash.iteritems()
+                               for (cc_id, cc) in self.coreference_chain_hash.items()
                                for cl in cc]
 
         coref_links_and_ids.sort(coref_link_sorter)
@@ -1424,7 +1426,7 @@ class coreference_document:
             a_coreference_sgml_string = re.sub("~([A-Z]+)", "\g<1>",  a_coreference_sgml_string)
             a_coreference_sgml_string = a_coreference_sgml_string.strip()
 
-            if(not filtered_coreference_sgml_tokens_hash.has_key(a_tree_document[i].coref_section)):
+            if(a_tree_document[i].coref_section not in filtered_coreference_sgml_tokens_hash):
                 filtered_coreference_sgml_tokens_hash[a_tree_document[i].coref_section] = []
 
             filtered_coreference_sgml_tokens_hash[a_tree_document[i].coref_section].append(a_coreference_sgml_string)
@@ -1433,7 +1435,7 @@ class coreference_document:
             a_word_string = a_word_string.strip()
             a_word_string = re.sub("~([A-Z]+)", "\g<1>",  a_word_string)
 
-            if(not filtered_leaves_hash.has_key(a_tree_document[i].coref_section)):
+            if(a_tree_document[i].coref_section not in filtered_leaves_hash):
                 filtered_leaves_hash[a_tree_document[i].coref_section] = []
 
             filtered_leaves_hash[a_tree_document[i].coref_section].append(a_word_string)
@@ -1443,7 +1445,7 @@ class coreference_document:
 
         assert len(filtered_coreference_sgml_tokens_hash) == len(filtered_leaves_hash)
 
-        a_sections = filtered_coreference_sgml_tokens_hash.keys()
+        a_sections = list(filtered_coreference_sgml_tokens_hash.keys())
         a_sections.sort()
         on.common.log.debug("a_sections: %s" % (a_sections), on.common.log.DEBUG, on.common.log.MIN_VERBOSITY)
 
@@ -1528,9 +1530,9 @@ class coreference_bank(abstract_bank):
 
             if len(a_coreference_document.sentence_tokens_list) != len(a_tree_document):
                 for i, line in enumerate(a_coreference_document.sentence_tokens_list):
-                    print "C", i, " ".join(line)[:25]
+                    print("C", i, " ".join(line)[:25])
                 for i, a_tree in enumerate(a_tree_document):
-                    print "P", i, a_tree.get_word_string()[:25]
+                    print("P", i, a_tree.get_word_string()[:25])
 
                 on.common.log.report("coreference", "bad coref document SERIOUS",
                                      coref_sentences=len(a_coreference_document.sentence_tokens_list),
@@ -1649,7 +1651,7 @@ class coreference_bank(abstract_bank):
             a_coreference_document.sentence_tokens_list = list(a_tree_document.sentence_tokens_as_lists(make_sgml_safe=True))
 
 
-            for a_coreference_chain_id, a_coreference_chain in a_coreference_document.coreference_chain_hash.iteritems():
+            for a_coreference_chain_id, a_coreference_chain in a_coreference_document.coreference_chain_hash.items():
                 info = [["document_id", a_coreference_document.document_id],
                         ["tree_document_length", len(a_tree_document)]]
 

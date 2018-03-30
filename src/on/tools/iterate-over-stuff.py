@@ -33,17 +33,17 @@ def process_subcorpus_a(a_subcorpus):
                 b.originals += len(a_tree.originals)
                 b.translations += len(a_tree.translations)
 
-            print b.td.document_id, "(%s) has:" % b.td.tag
+            print(b.td.document_id, "(%s) has:" % b.td.tag)
 
-            print " -", b.leaves, "leaves"
-            print " -", b.senses, "senses"
-            print " -", b.props, "propositions"
-            print " -", b.originals, "originals"
-            print " -", b.translations, "translations"
+            print(" -", b.leaves, "leaves")
+            print(" -", b.senses, "senses")
+            print(" -", b.props, "propositions")
+            print(" -", b.originals, "originals")
+            print(" -", b.translations, "translations")
 
-    print "All documents combined have:"
-    print " -", td_originals, "originals"
-    print " -", td_translations, "translations"
+    print("All documents combined have:")
+    print(" -", td_originals, "originals")
+    print(" -", td_translations, "translations")
 
         
 
@@ -52,7 +52,7 @@ def start():
     a_ontonotes = on.ontonotes(config)
 
     for a_subcorpus in a_ontonotes:
-        print "  >> processing subcorpus %s" % a_subcorpus.id
+        print("  >> processing subcorpus %s" % a_subcorpus.id)
         process_subcorpus_a(a_subcorpus)
         
 if __name__ == "__main__":

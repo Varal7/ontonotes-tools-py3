@@ -71,7 +71,7 @@ Class:
 """
 
 #---- standard python imports ----#
-from __future__ import with_statement
+
 
 import operator
 import os.path
@@ -86,7 +86,7 @@ import getopt
 import zlib
 import gzip
 import codecs
-import commands
+import subprocess
 import traceback
 import weakref
 
@@ -233,7 +233,7 @@ class ontonotes:
         else:
             raise Exception("data_source must be 'files', 'db', or 'auto' -- given %r" % data_source)
 
-        for a_subcorpus in self.subcorpus_hash.itervalues():
+        for a_subcorpus in self.subcorpus_hash.values():
             a_subcorpus._hide_errors = hide_errors
 
     def config_has_opt(self, key):
@@ -399,7 +399,7 @@ class ontonotes:
         if not (a_db, a_host, a_user) in connections:
             try:
                 connections[a_db, a_host, a_user] = MySQLdb.connect(host=a_host, db=a_db, user=a_user, charset="utf8")
-            except MySQLdb.Error, e:
+            except MySQLdb.Error as e:
                 on.common.log.error("%s\n%s%s\n%s%s" % (
                     "cannot connect to database server.",
                     "error code    : ", str(e.args[0]),
@@ -527,7 +527,7 @@ insert into ontonotes
                 try:
                     cursor.execute(thing.sql_create_statement)
                 except Exception:
-                    print thing.sql_create_statement
+                    print(thing.sql_create_statement)
                     raise
 
                 table_names.append(thing.sql_table_name)
@@ -547,7 +547,7 @@ insert into ontonotes
             try:
                 cursor.execute(sql_create_stmt)
             except Exception:
-                print table_name
+                print(table_name)
                 raise
 
             table_names.append(table_name)
@@ -581,7 +581,7 @@ insert into ontonotes
 
         #---- write contained objects to database ----#
         #---- write the subcorpus table to db ----#
-        for a_subcorpus in self.subcorpus_hash.itervalues():
+        for a_subcorpus in self.subcorpus_hash.values():
             a_subcorpus.write_to_db(a_cursor)
 
         self.write_type_tables_to_db(a_cursor)
@@ -593,26 +593,26 @@ insert into ontonotes
     #  @param cursor The database cursor to be used for processing
     #
     def dump_db_table(self, cursor):
-        print "\n"*5
-        print "-"*80
-        print " "*5, "description and contents of the ontonotes table", " "*30
-        print "-"*80
+        print("\n"*5)
+        print("-"*80)
+        print(" "*5, "description and contents of the ontonotes table", " "*30)
+        print("-"*80)
         #---- just check if the table was created ----#
         cursor.execute("""show tables;""")
-        print cursor.fetchall()
+        print(cursor.fetchall())
 
         #---- and print its description ----#
         cursor.execute("""describe ontonotes;""")
-        print cursor.fetchall()
+        print(cursor.fetchall())
 
         #---- and print its contents ----#
         cursor.execute("""select * from ontonotes;""")
         rows = cursor.fetchall()
 
         for row in rows:
-            print "id: %s" % (row["id"])
-            print "."*40
-        print "number of rows returned: %s" % (cursor.rowcount)
+            print("id: %s" % (row["id"]))
+            print("."*40)
+        print("number of rows returned: %s" % (cursor.rowcount))
 
 
     def _from_db(self):

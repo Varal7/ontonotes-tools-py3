@@ -81,7 +81,7 @@ Correspondences:
 
 # author: sameer pradhan
 
-from __future__ import with_statement
+
 import os
 import os.path
 import sys

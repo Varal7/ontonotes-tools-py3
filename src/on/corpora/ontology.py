@@ -73,7 +73,7 @@
 
 #---- standard python imports ----#
 
-from __future__ import with_statement
+
 
 import operator
 import os.path
@@ -133,13 +133,13 @@ class ontology:
         v_e_list = a_dot_string.split("\n\t")
 
         for v_e in v_e_list:
-            if(not v_e_hash.has_key(v_e)):
+            if(v_e not in v_e_hash):
                 v_e_hash[v_e] = v_e
             else:
                 on.common.log.debug("ignoring duplicate vertex/edge", on.common.log.DEBUG, on.common.log.MAX_VERBOSITY)
 
         a_dot_string = ""
-        for v_e in v_e_hash.keys():
+        for v_e in list(v_e_hash.keys()):
             a_dot_string = a_dot_string + "\n\t" + v_e
 
         a_dot_string = a_dot_string.strip()
@@ -374,14 +374,14 @@ class sense_pool:
 
                     # check if it is a concept or pool and add it to the appropriate list
                     if(on.common.util.matches_pool_id_specification(a_id)):
-                        if(sense_pool_type.type_hash.has_key(a_id)):
+                        if(a_id in sense_pool_type.type_hash):
                             self.parent_pools_list.append(a_id)
                         else:
                             on.common.log.warning("found an undefined sense pool '%s' as being a parent" % (a_id))
                             raise no_such_parent_sense_pool_error
                     # else assume it to be a concept (as there is no specific definition for it)
                     else:
-                        if( concept_type.type_hash.has_key(a_id) ):
+                        if( a_id in concept_type.type_hash ):
                             self.parent_concepts_list.append(a_id)
                         else:
                             on.common.log.warning("found an undefined concept '%s' as being a parent" % (a_id))
@@ -396,14 +396,14 @@ class sense_pool:
 
                     # check if it is a concept or pool and add it to the appropriate list
                     if(on.common.util.matches_pool_id_specification(a_id)):
-                        if(sense_pool_type.type_hash.has_key(a_id)):
+                        if(a_id in sense_pool_type.type_hash):
                             self.related_pools_list.append(a_id)
                         else:
                             on.common.log.warning("found an undefined sense pool '%s' as being related" % (a_id))
                             raise no_such_parent_sense_pool_error
                     # else assume it to be a concept (as there is no specific definition for it)
                     else:
-                        if( concept_type.type_hash.has_key(a_id) ):
+                        if( a_id in concept_type.type_hash ):
                             self.related_concepts_list.append(a_id)
                         else:
                             on.common.log.warning("found an undefined concept '%s' as being related" % (a_id))
@@ -857,7 +857,7 @@ class concept:
                     a_relation_id = a_relationtag_tree.text
 
                     # since relation is just another concept, we won't create a new relation class
-                    if(not concept_type.type_hash.has_key(a_relation_id)):
+                    if(a_relation_id not in concept_type.type_hash):
                         on.common.log.warning("found an undefined concept '%s' as being related" % (a_relation_id))
                         raise no_such_parent_concept_error
                     self.relation_ids.append(a_relation_id)
@@ -868,7 +868,7 @@ class concept:
                     a_parent_id = a_subtag_tree.text
 
                     # since parent is just another concept, we won't create a new class
-                    if(not concept_type.type_hash.has_key(a_parent_id)):
+                    if(a_parent_id not in concept_type.type_hash):
                         on.common.log.warning("found an undefined concept '%s' as being a parent" % (a_parent_id))
                         raise no_such_parent_concept_error
 

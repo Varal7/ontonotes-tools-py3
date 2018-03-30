@@ -179,7 +179,7 @@ Correspondences:
 
 # author: sameer pradhan
 
-from __future__ import with_statement
+
 import sys
 import codecs
 

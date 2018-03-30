@@ -2,7 +2,7 @@
 Usage: python create_onfs.py -c create_onfs.conf
 """
 
-from __future__ import with_statement
+
 
 import on
 import on.common
@@ -19,7 +19,7 @@ def create_onfs():
     a_ontonotes = on.ontonotes(config)
 
     for a_subcorpus in a_ontonotes:
-        print "Loading", a_subcorpus.id
+        print("Loading", a_subcorpus.id)
         a_subcorpus["parse"].dump_onf(a_cursor=None, out_dir=config["out", "out_dir"])
 
 if __name__ == "__main__":

@@ -85,7 +85,7 @@ Correspondences:
 
 
 #---- standard python imports ----#
-from __future__ import with_statement
+
 
 import operator
 import os.path
@@ -439,7 +439,7 @@ class name_entity_set(object):
         best_votes = 0
         best_index = None
 
-        for index, num_votes in votes.iteritems():
+        for index, num_votes in votes.items():
             if num_votes > best_votes or best_index is None:
                 best_index = index
 
@@ -459,7 +459,7 @@ class name_entity_set(object):
     def copy_to_different_trees(self, alignment_from_to):
         to_name_entity_set = name_entity_set(self.document_id)
 
-        for a_name_entity_list in self.name_entity_hash.itervalues():
+        for a_name_entity_list in self.name_entity_hash.values():
             for a_name_entity in a_name_entity_list:
                 if a_name_entity.valid:
                     new_name_entity = a_name_entity.copy_to_different_trees(alignment_from_to)
@@ -532,7 +532,7 @@ class name_tagged_document:
 
             on.common.log.debug("processing document: %s" % (self.document_id), on.common.log.DEBUG, on.common.log.MAX_VERBOSITY)
 
-            self.document_string = self.document_string.replace(u'\ufeff', '') # delete BOM if present
+            self.document_string = self.document_string.replace('\ufeff', '') # delete BOM if present
 
             #---- now lets remove the sgml tags surrounding the document ----#
             self.document_string = on.common.util.remove_doc_tags(self.document_string)
@@ -785,7 +785,7 @@ class name_tagged_document:
 
     def write_to_db(self, cursor):
         for a_name_entity_set in self.name_entity_sets:
-            for a_name_entity_list in a_name_entity_set.name_entity_hash.itervalues():
+            for a_name_entity_list in a_name_entity_set.name_entity_hash.values():
                 for a_name_entity in a_name_entity_list:
                     if a_name_entity.valid:
                         a_name_entity.write_to_db(cursor)

@@ -79,7 +79,7 @@
 """
 
 #---- standard python imports ----#
-from __future__ import with_statement
+
 import os
 import os.path
 import codecs
@@ -197,12 +197,12 @@ class abstract_open_type_table:
 
     @classmethod
     def write_to_db(cls, cursor):
-        for a_type in cls.type_hash.keys():
+        for a_type in list(cls.type_hash.keys()):
             insert_ignoring_dups(cls, cursor, a_type)
 
     @classmethod
     def __repr__(cls):
-        return " ".join(cls.type_hash.keys())
+        return " ".join(list(cls.type_hash.keys()))
 
     @classmethod
     def get_table(cls):
@@ -567,7 +567,7 @@ class subcorpus(UserDict.DictMixin):
                     elif annotation_type.endswith("parse"): # only limit the parses
                         num_loaded[0] += 1
 
-                if(not self.file_hash.has_key(annotation_type)):
+                if(annotation_type not in self.file_hash):
                     self.file_hash[annotation_type] = []
 
                 physical_filename = os.path.join(
@@ -915,7 +915,7 @@ class subcorpus(UserDict.DictMixin):
 
             if tree_extension not in self:
                 raise Exception("Can't enrich %r with %r because %r is not loaded.  (loaded: %r)" % (
-                    tree_extension, refer_extension, tree_extension, self.banks.keys()))
+                    tree_extension, refer_extension, tree_extension, list(self.banks.keys())))
             if not self[tree_extension]:
                 continue
 
@@ -984,7 +984,7 @@ class subcorpus(UserDict.DictMixin):
 
         """
 
-        vX_parses = [x for x in self.keys()
+        vX_parses = [x for x in list(self.keys())
                      if (x.startswith("v") and
                          x.endswith("_parse") and
                          self[x])]
@@ -1018,7 +1018,7 @@ class subcorpus(UserDict.DictMixin):
 
         """
 
-        return [self[a_bank_key] for a_bank_key in self.keys()
+        return [self[a_bank_key] for a_bank_key in list(self.keys())
                 if a_bank_key == standard_extension or a_bank_key.endswith("_" + standard_extension)]
 
 
@@ -1026,10 +1026,10 @@ class subcorpus(UserDict.DictMixin):
         self.banks[key] = value
 
     def keys(self):
-        return self.banks.keys()
+        return list(self.banks.keys())
 
     def __repr__(self):
-        bank_ext_with_id = ((a_bank_ext, a_bank.id) for a_bank_ext, a_bank in self.banks.iteritems())
+        bank_ext_with_id = ((a_bank_ext, a_bank.id) for a_bank_ext, a_bank in self.banks.items())
 
         return "subcorpus instance, id=%s, banks:" % (self.id) + "\n" + on.common.util.repr_helper(bank_ext_with_id)
 
@@ -1090,10 +1090,10 @@ class subcorpus(UserDict.DictMixin):
     #
     # annotation_type can take values "coref" "parse" "sense" "prop" or "name"
     def get_files(self, annotation_type):
-        if(self.file_hash.has_key(annotation_type)):
+        if(annotation_type in self.file_hash):
             return self.file_hash[annotation_type]
         else:
-            on.common.log.status("keys: %s" % self.file_hash.keys())
+            on.common.log.status("keys: %s" % list(self.file_hash.keys()))
             return {}
 
     def add_bank(self, bank_name, a_bank):
@@ -1175,7 +1175,7 @@ insert into subcorpus
 
         #---- write all the banks to the database ----#
         if not only_these_banks:
-            only_these_banks = self.banks.keys()
+            only_these_banks = list(self.banks.keys())
 
         for a_bank in only_these_banks:
             self[a_bank].write_to_db(a_cursor)

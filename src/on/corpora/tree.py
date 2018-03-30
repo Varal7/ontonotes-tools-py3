@@ -90,7 +90,7 @@ Correspondences:
 
 
 
-from __future__ import with_statement
+
 
 # standard python imports
 import operator
@@ -105,7 +105,7 @@ import sys
 import re
 import exceptions
 import codecs
-import commands
+import subprocess
 import tempfile
 import itertools
 
@@ -1299,7 +1299,7 @@ class lemma:
 
         if len(rows) != 1:
             assert all(row["lemma"] == rows[0]["lemma"] for row in rows), \
-                   "\n".join(", ".join(": ".join(a) for a in row.iteritems()) for row in rows)
+                   "\n".join(", ".join(": ".join(a) for a in row.items()) for row in rows)
 
         r = rows[0]
 
@@ -1813,7 +1813,7 @@ class tree(object):
             n_args = args + (["tree", self.pretty_print()], )
         else:
             n_args = args
-        assert not kwargs or kwargs.keys() == ["pretty_print"]
+        assert not kwargs or list(kwargs.keys()) == ["pretty_print"]
 
 
         try:
@@ -1858,9 +1858,9 @@ class tree(object):
             node_start_match = cls.NODE_START_MATCHER.match(syntactic_parse)
             result = tree(node_start_match.group(1),document_tag=document_tag)  # create a tree with the required non-terminal tag, and a default word value of None, since none is specified here
         except Exception:
-            print syntactic_parse
-            print len(syntactic_parse)
-            print tree.pretty_print_tree_string(syntactic_parse)
+            print(syntactic_parse)
+            print(len(syntactic_parse))
+            print(tree.pretty_print_tree_string(syntactic_parse))
             raise
 
         result.start = word_count
@@ -1871,7 +1871,7 @@ class tree(object):
             try:
                 child, remainder, word_count = cls.from_string_helper(remainder, word_count)
             except Exception:
-                print "\nparent:", syntactic_parse
+                print("\nparent:", syntactic_parse)
                 raise
             child.parent = result
             result.children.append(child)
@@ -2048,7 +2048,7 @@ class tree(object):
 
             get_nodes_by_trace_number_helper(a_tree)
 
-            for trace_number in nbtn.keys():
+            for trace_number in list(nbtn.keys()):
                 """ if we we're supposed to look for gapping, return
                 only those where we found gapping.  And vice versa """
 
@@ -2085,7 +2085,7 @@ class tree(object):
                                  "Tree using same index number for gapping and tracing: %s in tree %s" %
                                  (self.to_string(), self.id))
 
-        for trace_number, nodes in trace_nodes_by_index.iteritems():
+        for trace_number, nodes in trace_nodes_by_index.items():
 
             changes_ok = True
             if any(get_child_word_trace_number(node) for node in nodes):
@@ -2165,7 +2165,7 @@ class tree(object):
                 target.reference_leaves.append(source)
 
 
-        for trace_number, nodes in gap_nodes_by_index.iteritems():
+        for trace_number, nodes in gap_nodes_by_index.items():
 
             node = nodes[0]
             new_tag = safe_replace(node.tag, "=" + trace_number, "-" + trace_number)
@@ -2716,7 +2716,7 @@ class tree(object):
                         del a_subtree.children[i]
 
                         if(len(a_subtree.children) == 0):
-                            print "came here"
+                            print("came here")
                             a_subtree.marked_for_deletion = True
 
                             need_to_delete_some_node = True
@@ -2731,7 +2731,7 @@ class tree(object):
                 i=0
                 while(i<len(a_subtree.children)):
                     if(a_subtree.children[i].marked_for_deletion == True):
-                        print "marked for deletion:", a_subtree.children[i]
+                        print("marked for deletion:", a_subtree.children[i])
                         del a_subtree.children[i]
                     else:
                         i=i+1
@@ -2920,7 +2920,7 @@ class tree(object):
 
         return leaves
 
-    def __nonzero__(self):
+    def __bool__(self):
         return True
 
     def __len__(self):
@@ -3028,42 +3028,42 @@ class tree(object):
 
         # from bert 2009-07-29
         lemma_map = {
-            u'\u4e0d\u8981': u'\u8981',
-            u'\u4e25\u4e25\u5b9e\u5b9e': u'\u4e25\u5b9e',
-            u'\u4f4e\u4f4e': u'\u4f4e',
-            u'\u4f4f\u5728': u'\u4f4f',
-            u'\u5149\u5149': u'\u5149',
-            u'\u5199\u5199': u'\u5199',
-            u'\u5229\u4ed6': u'\u4ed6',
-            u'\u5520\u5520\u53e8\u53e8': u'\u5520\u53e8',
-            u'\u559d\u5976': u'\u559d',
-            u'\u56de\u5473\u56de\u5473': u'\u56de\u5473',
-            u'\u5750\u5728': u'\u5750',
-            u'\u5b58\u94b1': u'\u5b58',
-            u'\u5df2\u77e5': u'\u77e5',
-            u'\u5f97\u5b50': u'\u5f97',
-            u'\u610f\u601d\u610f\u601d': u'\u610f\u601d',
-            u'\u6258\u4eba': u'\u6258',
-            u'\u6392\u6210\u957f\u9f99': u'\u6392\u6210',
-            u'\u6392\u9664\u5728\u5916': u'\u6392\u9664',
-            u'\u63d0\u7a0e': u'\u63d0',
-            u'\u6709\u52a9\u76ca\u4e8e': u'\u6709',
-            u'\u6709\u95e8\u574e': u'\u6709',
-            u'\u671b\u671b': u'\u671b',
-            u'\u70b8\u697c': u'\u70b8',
-            u'\u72af\u9519\u8bef': u'\u72af',
-            u'\u73a9\u73a9': u'\u73a9',
-            u'\u7ad9\u5728': u'\u7ad9',
-            u'\u7cbe\u7626\u7cbe\u7626': u'\u7cbe\u7626',
-            u'\u7eba\u7ebf': u'\u7eba',
-            u'\u82b1\u5728': u'\u82b1',
-            u'\u89e3\u4eba\u610f': u'\u89e3',
-            u'\u8c08\u8c08': u'\u8c08',
-            u'\u8eb2\u8eb2\u85cf\u85cf': u'\u8eb2\u85cf',
-            u'\u8f6c\u8f7d\u81ea': u'\u8f6c\u8f7d',
-            u'\u8fc7\u5c0f\u5e74': u'\u8fc7',
-            u'\u957f\u5f97': u'\u957f',
-            u'\u96c7\u4e86': u'\u96c7'}
+            '\u4e0d\u8981': '\u8981',
+            '\u4e25\u4e25\u5b9e\u5b9e': '\u4e25\u5b9e',
+            '\u4f4e\u4f4e': '\u4f4e',
+            '\u4f4f\u5728': '\u4f4f',
+            '\u5149\u5149': '\u5149',
+            '\u5199\u5199': '\u5199',
+            '\u5229\u4ed6': '\u4ed6',
+            '\u5520\u5520\u53e8\u53e8': '\u5520\u53e8',
+            '\u559d\u5976': '\u559d',
+            '\u56de\u5473\u56de\u5473': '\u56de\u5473',
+            '\u5750\u5728': '\u5750',
+            '\u5b58\u94b1': '\u5b58',
+            '\u5df2\u77e5': '\u77e5',
+            '\u5f97\u5b50': '\u5f97',
+            '\u610f\u601d\u610f\u601d': '\u610f\u601d',
+            '\u6258\u4eba': '\u6258',
+            '\u6392\u6210\u957f\u9f99': '\u6392\u6210',
+            '\u6392\u9664\u5728\u5916': '\u6392\u9664',
+            '\u63d0\u7a0e': '\u63d0',
+            '\u6709\u52a9\u76ca\u4e8e': '\u6709',
+            '\u6709\u95e8\u574e': '\u6709',
+            '\u671b\u671b': '\u671b',
+            '\u70b8\u697c': '\u70b8',
+            '\u72af\u9519\u8bef': '\u72af',
+            '\u73a9\u73a9': '\u73a9',
+            '\u7ad9\u5728': '\u7ad9',
+            '\u7cbe\u7626\u7cbe\u7626': '\u7cbe\u7626',
+            '\u7eba\u7ebf': '\u7eba',
+            '\u82b1\u5728': '\u82b1',
+            '\u89e3\u4eba\u610f': '\u89e3',
+            '\u8c08\u8c08': '\u8c08',
+            '\u8eb2\u8eb2\u85cf\u85cf': '\u8eb2\u85cf',
+            '\u8f6c\u8f7d\u81ea': '\u8f6c\u8f7d',
+            '\u8fc7\u5c0f\u5e74': '\u8fc7',
+            '\u957f\u5f97': '\u957f',
+            '\u96c7\u4e86': '\u96c7'}
 
         if w in lemma_map:
             return lemma_map[w]
@@ -3322,7 +3322,7 @@ class tree(object):
         a_subtree = self.get_subtree_by_span(start, end)
 
         if not a_subtree:
-            on.common.log.warning(u"could not find a matching subtree id for '%s'.   returning False" % (self.get_se_word_string(start, end)), on.common.log.MAX_VERBOSITY)
+            on.common.log.warning("could not find a matching subtree id for '%s'.   returning False" % (self.get_se_word_string(start, end)), on.common.log.MAX_VERBOSITY)
             return False
         return a_subtree.id
 
@@ -3333,7 +3333,7 @@ class tree(object):
 
         a_subtree = self.get_subtree_by_span(start, end)
         if not a_subtree:
-            on.common.log.warning(u"could not find a matching subtree id for '%s'.   returning False" % (self.get_se_word_string(start, end)), on.common.log.MAX_VERBOSITY)
+            on.common.log.warning("could not find a matching subtree id for '%s'.   returning False" % (self.get_se_word_string(start, end)), on.common.log.MAX_VERBOSITY)
             return False
         while len(a_subtree.children) == 1:
             a_subtree = a_subtree.children[0]
@@ -3602,11 +3602,11 @@ class tree(object):
         maxindent=300
 
         # Table of indentation at tree depth
-        depth_to_indent = [0 for i in xrange(maxdepth)]
+        depth_to_indent = [0 for i in range(maxdepth)]
 
         # Initialize indent_string[i] to be a string of i spaces
-        indent_string = ['' for i in xrange(maxindent)]
-        for i in xrange(maxindent-1):
+        indent_string = ['' for i in range(maxindent)]
+        for i in range(maxindent-1):
             indent_string[i+1] = indent_string[i] + ' '
 
         # RE object for split that matches on a ')' followed by not a ')', but only consumes the ')'
@@ -4106,7 +4106,7 @@ class tree_document:
                     try:
                         a_sentence_from_leaves = strip_traces(" ".join(a_leaf.word for a_leaf in a_tree))
                     except Exception:
-                        print parse_list[i]
+                        print(parse_list[i])
                         raise
 
                     a_sentence_from_flat_parse = strip_traces(on.common.util.parse2word(parse_list[i]))
@@ -4139,7 +4139,7 @@ class tree_document:
                     try:
                         a_tree.check_subtrees_fix_quotes()
                     except Exception:
-                        print parse_list[i]
+                        print(parse_list[i])
                         raise
 
                     # lets process the syntactic links
@@ -4158,7 +4158,7 @@ class tree_document:
                                         try:
                                             lemma_lemma, coarse_sense = lemma_lemma.split("_")
                                         except ValueError:
-                                            print lemma_lemma
+                                            print(lemma_lemma)
                                             raise
 
                                     a_leaf.lemma_object = lemma(list_of_input_strings[document_word_index],
@@ -4188,7 +4188,7 @@ class tree_document:
 
                     self.tree_hash[tree_id] = a_tree
                     self.tree_ids.append(tree_id)
-                except Exception, e:
+                except Exception as e:
                     #on.common.log.report("treebank", "SOME PROBLEM WITH THE PARSE",
                     #                     "tree_id: %s\n" % (tree_id) + str(e))
                     raise
@@ -4436,7 +4436,7 @@ class tree_document:
                             add_to_seq(gv, gv_leaf, gv_leaf.trace_type)
 
                 if ga.seq and gb.seq:
-                    for ga_seq_idx, gb_seq_idx in on.common.util.diff_align(ga.seq, gb.seq, map_differences=True).iteritems():
+                    for ga_seq_idx, gb_seq_idx in on.common.util.diff_align(ga.seq, gb.seq, map_differences=True).items():
                         ga_leaf = ga.seq_to_leaf[ga_seq_idx]
                         gb_leaf = gb.seq_to_leaf[gb_seq_idx]
 
@@ -4649,7 +4649,7 @@ class tree_document:
         leaf_in_us_2_leaf_in_them = defaultdict(list)
         leaf_in_them_2_leaf_in_us = defaultdict(list)
 
-        for a_seq_idx, b_seq_idx in on.common.util.diff_align(a.seq, b.seq, map_differences).iteritems():
+        for a_seq_idx, b_seq_idx in on.common.util.diff_align(a.seq, b.seq, map_differences).items():
             a_leaf = a.seq_to_leaf[a_seq_idx]
             b_leaf = b.seq_to_leaf[b_seq_idx]
 
@@ -4897,7 +4897,7 @@ class treebank(abstract_bank):
                         on.common.log.debug("adding S", on.common.log.DEBUG, on.common.log.MAX_VERBOSITY)
                         sentence_id_list.append(item[2])
                         paragraph_id_list.append(paragraph_index)  # sentence is outside a paragraph
-                        if(headline_sentence_id_hash.has_key(item[2])):
+                        if(item[2] in headline_sentence_id_hash):
                             headline_flag_list.append(1)
                         else:
                             headline_flag_list.append(0)
@@ -4962,7 +4962,7 @@ class treebank(abstract_bank):
 
 
                 if (a_subcorpus.language_id == "ch" and
-                    self.tree_start_end_tuples_hash.has_key(a_file.document_id) and
+                    a_file.document_id in self.tree_start_end_tuples_hash and
                     self.tree_start_end_tuples_hash[a_file.document_id] and
                     len(self.tree_start_end_tuples_hash[a_file.document_id]) != len(parse_list)):
 
@@ -5026,7 +5026,7 @@ whether there are more than one parses per timing range, and correct accordingly
         """ copy from_treebank.banks to this treebank, dealing with parsing differences """
 
         if banks == None:
-            banks = from_treebank.banks.keys()
+            banks = list(from_treebank.banks.keys())
 
         alignments_from_to = {}
         alignments_to_from = {}
@@ -5100,7 +5100,7 @@ whether there are more than one parses per timing range, and correct accordingly
                 alignments = 0
                 should_have_aligned = 0
 
-                for a_leaf, b_leaf_list in from_to.iteritems():
+                for a_leaf, b_leaf_list in from_to.items():
 
                     b_si = -1
                     b_ti = -1
@@ -5336,9 +5336,9 @@ insert into treebank
 
             return alignment_from_to[from_leaf][which_leaf]
 
-        look_range = range(word, -1, -1)
+        look_range = list(range(word, -1, -1))
         if beginning_or_end == "beginning":
-            look_range = range(word, len(list(from_leaf.get_root().leaves())), 1)
+            look_range = list(range(word, len(list(from_leaf.get_root().leaves())), 1))
 
         for w in look_range:
             """ If it's not in the hash, unless it is a trace, we give

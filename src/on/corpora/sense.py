@@ -165,7 +165,7 @@ Classes:
 """
 
 #---- standard python imports ----#
-from __future__ import with_statement
+
 import operator
 import os.path
 
@@ -448,7 +448,7 @@ class on_sense(object):
                 self.leaf = a_tree.get_leaf_by_token_index(self.token_index)
             else:
                 raise KeyError("No index available")
-        except KeyError, e:
+        except KeyError as e:
             self.valid = False
 
     def __repr__(self):
@@ -590,7 +590,7 @@ default character set utf8;
     @classmethod
     def write_to_db(cls, cursor):
 
-        for a_type in cls.type_hash.keys():
+        for a_type in list(cls.type_hash.keys()):
             insert_ignoring_dups(cls, cursor, a_type, cls.lemma_hash[a_type],
                                  cls.wn_sense_num_hash[a_type],
                                  cls.pos_hash[a_type], cls.wn_version_hash[a_type])
@@ -718,7 +718,7 @@ class on_sense_type(on.corpora.abstract_open_type_table):
     def get_name(cls, a_lemma, a_pos, a_sense):
         """ given a lemma, pos, and sense number, return the name from the sense inventory """
 
-        candidate_ids = [a_id for (a_id, lemma) in cls.sense_lemma_hash.iteritems()
+        candidate_ids = [a_id for (a_id, lemma) in cls.sense_lemma_hash.items()
                          if (lemma == a_lemma and cls.sense_pos_hash[a_id] == a_pos and \
                                                   cls.sense_number_hash[a_id] == a_sense)]
 
@@ -827,7 +827,7 @@ default character set utf8;
 
     @classmethod
     def write_to_db(cls, cursor):
-        for a_type in cls.type_hash.keys():
+        for a_type in list(cls.type_hash.keys()):
             insert_ignoring_dups(cls, cursor,
                  a_type, cls.sense_lemma_hash[a_type],
                  cls.sense_number_hash[a_type],
@@ -931,12 +931,12 @@ class on_sense_lemma_type(on.corpora.abstract_open_type_table):
 
     @classmethod
     def write_to_db(cls, cursor):
-        for id, (lemma, pos) in cls.lemma_pos_hash.iteritems():
+        for id, (lemma, pos) in cls.lemma_pos_hash.items():
             insert_ignoring_dups(cls, cursor, id, lemma, pos, 0, 0)
 
         for counter, c_name in [[cls.count,             "count"],
                                 [cls.ann_1_2_agreement, "ann_1_2_agreement"]]:
-            for id, val in counter.iteritems():
+            for id, val in counter.items():
                 cursor.execute("update on_sense_lemma_type set %s=%s+%s where id='%s'" % esc(
                     c_name, c_name, val, id))
 
@@ -1099,7 +1099,7 @@ class sense_inventory:
         #---- create a DOM object for the xml string ----#
         try:
             a_inventory_tree = ElementTree.fromstring(a_xml_string)
-        except Exception, e:
+        except Exception as e:
             drop("problem reading sense inventory xml file", ["error", e])
 
         a_lemma_attribute = on.common.util.make_sgml_unsafe(on.common.util.get_attribute(a_inventory_tree, "lemma"))
@@ -1177,14 +1177,14 @@ class sense_inventory:
                     #---- now get the wn elements ----#
                     for a_wn_tree in a_mapping_tree.findall(".//wn"):
 
-                        if(a_wn_tree.attrib.has_key("lemma")):
+                        if("lemma" in a_wn_tree.attrib):
                             a_wn_lemma = on.common.util.get_attribute(a_wn_tree, "lemma")
                         else:
                             #---- using the default lemma ----#
                             #---- there is an assumption that the wordnet lemma is the same as the one for the inventory, if it is not defined ----#
                             a_wn_lemma = self.lemma
 
-                        if(a_wn_tree.attrib.has_key("version")):
+                        if("version" in a_wn_tree.attrib):
                             a_wn_version = on.common.util.get_attribute(a_wn_tree, "version")
 
                             #---- check if it is indeed wordnet and not something else ----#
@@ -1240,19 +1240,19 @@ class sense_inventory:
                                          ["sense number", n])
 
 
-                if(self.sense_hash.has_key(a_on_sense_type.id)):
+                if(a_on_sense_type.id in self.sense_hash):
                     drop("sense inventories define this-sense multiple times", ["a_on_sense_type_id", a_on_sense_type.id])
                 else:
                     self.sense_hash[a_on_sense_type.id] = a_on_sense_type
 
 
     def num_senses(self):
-        return len(self.sense_hash.keys())
+        return len(list(self.sense_hash.keys()))
 
 
     def write_to_db(self, cursor):
 
-        for b_key, a_on_sense_type in self.sense_hash.iteritems():
+        for b_key, a_on_sense_type in self.sense_hash.items():
             a_on_sense_type.write_instance_to_db(b_key, cursor)
 
         if self.ita_dict:
@@ -1408,7 +1408,7 @@ class sense_tagged_document:
 
 
                 #---- add lemma_pos to the hash ----#
-                if(not self.lemma_pos_hash.has_key(lemma_pos)):
+                if(lemma_pos not in self.lemma_pos_hash):
                     self.lemma_pos_hash[lemma_pos] = 0
 
                 document_id = "%s" % (re.sub(".mrg", "", document_id))
@@ -1597,7 +1597,7 @@ class sense_bank(abstract_bank):
                     sense_inv_hash[a_lemma_pos] = on.corpora.sense.sense_inventory(
                         sense_inv_fname, sense_inv_file_str, lang_id, a_frame_set_hash)
 
-            except Exception, e:
+            except Exception as e:
                 on.common.log.report("senseinv", "sense inventory failed to load", fname=sense_inv_fname)
 
         sys.stderr.write("\n")
@@ -1626,7 +1626,7 @@ class sense_bank(abstract_bank):
             if lpos not in self.sense_inventory_hash:
                 return []
 
-            senses = [sense for sense in self.sense_inventory_hash[lpos].sense_hash.itervalues() if sense.sense_num == a_sense]
+            senses = [sense for sense in self.sense_inventory_hash[lpos].sense_hash.values() if sense.sense_num == a_sense]
 
             if len(senses) != 1:
                 on.common.log.report("sense", "pb_mappings -- did not expect invalid sense here",
@@ -1782,11 +1782,11 @@ insert into sense_bank
     @staticmethod
     def write_sense_inventory_hash_to_db(a_sense_inventory_hash, a_cursor):
         if not is_db_ref(a_sense_inventory_hash) and not is_not_loaded(a_sense_inventory_hash):
-            for a_sense_inventory in a_sense_inventory_hash.itervalues():
+            for a_sense_inventory in a_sense_inventory_hash.values():
                 try:
                     sys.stderr.write("... writing sense inventory %s [%s] \n" % (a_sense_inventory.lemma, a_sense_inventory.file_name))
                     a_sense_inventory.write_to_db(a_cursor)
-                except AttributeError, e:
+                except AttributeError as e:
                     on.common.log.report("sense", "Failed to write sense inventory to db", "si: %s [%s]" % (a_sense_inventory, a_sense_inventory.file_name))
             sys.stderr.write("\n")
 
