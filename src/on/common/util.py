@@ -317,7 +317,7 @@ html_entity_replacement_map = {"&#8217;": "'",
                                 "&quot;": "\"",
                                 "&apos;": "'"
                                  }
-                    
+
 
 
 uni2buck = {}
@@ -396,21 +396,20 @@ def clean_gold_parse( a_parse ):
     a_parse = re.sub(r"^\s+", "", a_parse)
     a_parse = re.sub(r"\s+$", "", a_parse)
 
-    return string.strip(a_parse)
-
+    return a_parse.strip()
 
 
 
 def parse2pos( a_parse ):
     pos_list = parse2pos_re.findall(a_parse)
-    return string.join(pos_list)
+    return " ".join(pos_list)
 
 
 
 
 def parse2word( a_parse ):
     word_list = parse2word_re.findall(a_parse)
-    return string.join(word_list)
+    return " ".join(word_list)
 
 
 
@@ -423,7 +422,7 @@ def parse2word_pos( a_parse ):
     for i in range(0, len(word_pos_list)):
         a_string = a_string + " " + word_pos_list[i][1] + "_" + word_pos_list[i][0]
 
-    return string.strip(a_string)
+    return a_string.strip()
 
 
 
@@ -432,13 +431,13 @@ def indented2flat_trees(file_name):
     file = codecs.open(file_name, "r", "utf-8")
 
     #---- join lines ----#
-    one_parse_string = string.join(file.readlines(), "")
+    one_parse_string = "".join(file.readlines())
 
     #---- strip any leading, following spaces ----#
-    one_parse_string = string.strip(one_parse_string)
+    one_parse_string = one_parse_string.strip()
 
     #---- list of parses ----#
-    parse_list = string.split(one_parse_string, "\n(")
+    parse_list = one_parse_string.split("\n(")
 
     #---- reintroduce the ( in the 1 to nth parses (excluding the 0th) ----#
     k=0
@@ -447,9 +446,9 @@ def indented2flat_trees(file_name):
 
     l=0
     for l in range(0, len(parse_list)):
-        parse_list[l] = string.strip(compress_space(parse_list[l]))
-        parse_list[l] = string.strip(re.sub(r"^\( ", "(TOP ", parse_list[l]))
-        parse_list[l] = string.strip(re.sub(r"^\(\(", "(TOP (", parse_list[l]))
+        parse_list[l] = compress_space(parse_list[l]).strip()
+        parse_list[l] = re.sub(r"^\( ", "(TOP ", parse_list[l]).strip()
+        parse_list[l] = re.sub(r"^\(\(", "(TOP (", parse_list[l]).strip()
 
     return parse_list
 
@@ -1120,7 +1119,7 @@ def apf2muc(in_file_name, out_file_name, source_file_name, new, chinese,
                 o_file.write("</DOC>\n")
         else:
             #---- remove first two lines ----#
-            coref_doc_lines = string.split(coref_doc_string, "\n")
+            coref_doc_lines = coref_doc_string.split("\n")
 
 
             if(len(coref_doc_lines[0].split()) != 1):
@@ -1139,9 +1138,9 @@ def apf2muc(in_file_name, out_file_name, source_file_name, new, chinese,
                     on.common.log.error("there might be a problem, please check")
                     ERROR = True
 
-                coref_doc_string = string.join(coref_doc_lines[2:], "\n")
+                coref_doc_string = "\n".join(coref_doc_lines[2:])
             else:
-                coref_doc_string = string.join(coref_doc_lines[1:], "\n")
+                coref_doc_string = "\n".join(coref_doc_lines[1:])
 
             o_file.write(header_string)
             o_file.write("\n" + coref_doc_string + "\n")
@@ -2981,7 +2980,7 @@ def pretty_print_table(rows, separator=None, out_file=None):
         for row in r_c_matrix:
             out_file.write("%s\n" % (" ".join(row).strip()))
         out_file.write("\n")
-            
+
         #raise NotImplementedError("this functionality has not yet been implemented")
 
 
@@ -3114,8 +3113,8 @@ def convert_html_entities(s):
   return s
 
 
-    
-    
+
+
 
 def normalize_html_entities(s):
     for k, v in html_entity_replacement_map.items():
