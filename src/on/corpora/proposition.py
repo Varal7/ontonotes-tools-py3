@@ -2925,7 +2925,7 @@ class proposition(object):
                                 if consider:
                                     start_ends.append((a_node.subtree.start, a_node.subtree.end, a_node))
 
-            start_ends.sort()
+            start_ends.sort(key=lambda x: (x[0], x[1]))
 
             return start_ends
 

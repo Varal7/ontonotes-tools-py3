@@ -1790,6 +1790,7 @@ class tree(object):
     def __ne__(self, other):
         return self._compare(other, lambda s, o: s != o)
 
+    __hash__ = object.__hash__
 
     @property
     def name_type(self):
