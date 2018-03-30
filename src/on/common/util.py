@@ -1281,7 +1281,7 @@ class FancyConfigParserError(Exception):
                            'Given something more like "config[%s]".' % (", ".join("%r"%v for v in vals)))
 
 
-class FancyConfigParser(configparser.SafeConfigParser):
+class FancyConfigParser(configparser.ConfigParser):
     """ make a config parser with support for config[section, value]
 
     raises :class:`FancyConfigParserError` on improper usage.
