@@ -1037,7 +1037,7 @@ class coreference_document:
                     for i in range(0, len(coref_chain)):
                         for j in range(i+1, len(coref_chain)):
                             #print coref_chain
-                            
+
                             #print "links: %s" % (len(coref_chain)), "%s: [%s, %s]" % (coref_chain[i].coreference_chain_id.split("@")[1], coref_chain[i].primary_start_index, coref_chain[i].primary_end_index), "%s: [%s, %s]" % (coref_chain[j].coreference_chain_id.split("@")[1], coref_chain[j].primary_start_index, coref_chain[j].primary_end_index)
 
                             if( coref_chain[i].overlaps(coref_chain[j]) and (coref_chain[i].primary_start_index == coref_chain[j].primary_start_index)):
@@ -1055,7 +1055,7 @@ class coreference_document:
 
                         if OVERLAP == True:
                             break
-                        
+
 
 
 
@@ -1196,28 +1196,20 @@ class coreference_document:
             raise Exception("Coreference documents may be dumped only from the database or after enrichment")
 
 
-        def coref_link_sorter(xxx_todo_changeme, xxx_todo_changeme1 ):
-
+        def coref_link_cmp_key(xxx_todo_changeme):
             # all smallest first
             #   sort first by sentence
             #   then by start token index
             #   then by end token index
-
-            (link_a, id_a) = xxx_todo_changeme
-            (link_b, id_b) = xxx_todo_changeme1
-            for compare in ['sentence_index', 'start_token_index', 'end_token_index']:
-                a_compare = int(getattr(link_a, compare))
-                b_compare = int(getattr(link_b, compare))
-                d = cmp(a_compare, b_compare)
-                if d != 0:
-                    return d
-            return 0
+            attributes = ['sentence_index', 'start_token_index', 'end_token_index']
+            link_a, id_a = xxx_todo_changeme
+            return [int(getattr(link_a, attr)) for attr in attributes]
 
         coref_links_and_ids = [(cl, cc_id)
                                for (cc_id, cc) in self.coreference_chain_hash.items()
                                for cl in cc]
 
-        coref_links_and_ids.sort(coref_link_sorter)
+        coref_links_and_ids.sort(key=coref_link_cmp_key)
 
         if muc_format:
             identifier_to_id_mapping = {}

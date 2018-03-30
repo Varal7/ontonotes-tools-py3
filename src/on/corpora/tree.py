@@ -1756,14 +1756,39 @@ class tree(object):
     def _incomparable(self, other):
         return type(self) != type(other) or not self.is_leaf() or not other.is_leaf() or self.document_id != other.document_id
 
-    def __cmp__(self, other):
+    def _cmpkey(self):
+        return (self.get_sentence_index(), self.get_token_index())
+
+    def _compare(self, other, method):
         if self._incomparable(other):
             if self is other:
-                return 0
-            return -1 # this means nonleaf_a < nonleaf_b   *and*   nonleaf_b < nonleaf_a.  oh well.
+                return method(0, 0)
+            # Python2 version:
+            #return -1 # this means nonleaf_a < nonleaf_b   *and*   nonleaf_b < nonleaf_a.  oh well.
+            # Python3 version:
+            return method(0, -1)
+        try:
+            return method(self._cmpkey(), other._cmpkey())
+        except (AttributeError, TypeError):
+            return NotImplemented
 
-        return cmp((self.get_sentence_index(), self.get_token_index()),
-                   (other.get_sentence_index(), other.get_token_index()))
+    def __lt__(self, other):
+        return self._compare(other, lambda s, o: s < o)
+
+    def __le__(self, other):
+        return self._compare(other, lambda s, o: s <= o)
+
+    def __eq__(self, other):
+        return self._compare(other, lambda s, o: s == o)
+
+    def __ge__(self, other):
+        return self._compare(other, lambda s, o: s >= o)
+
+    def __gt__(self, other):
+        return self._compare(other, lambda s, o: s > o)
+
+    def __ne__(self, other):
+        return self._compare(other, lambda s, o: s != o)
 
 
     @property
@@ -3881,7 +3906,7 @@ class tree_document:
                     on.common.log.debug("absolute_file_path: %s" % (absolute_file_path), on.common.log.DEBUG, on.common.log.MIN_VERBOSITY)
 
 
-                    
+
                     pos_filename = absolute_file_path.replace("parse", "lemma")
                     if(os.path.exists(pos_filename)):
                         pos_file = codecs.open(pos_filename, "r", "utf-8")

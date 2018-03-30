@@ -456,21 +456,12 @@ def indented2flat_trees(file_name):
 
 
 def sort_hash_keys_by_value( hash ):
-
-    def compare( tuple_1, tuple_2 ):
-        if( float(tuple_1[1]) < float(tuple_2[1]) ):
-            return -1
-        elif( float(tuple_1[1]) == float(tuple_2[1]) ):
-            return 0
-        else:
-            return 1
-
     tuple_list = []
     for key in list(hash.keys()):
         tuple = (key, hash[key])
         tuple_list.append(tuple)
 
-    tuple_list.sort(compare)
+    tuple_list.sort(key=lambda x: float(x[1]))
 
     first_item_list = []
     for item in tuple_list:
@@ -482,21 +473,12 @@ def sort_hash_keys_by_value( hash ):
 
 
 def sort_hash_keys_by_len_of_value( hash ):
-
-    def compare( tuple_1, tuple_2 ):
-        if( float(tuple_1[1]) < float(tuple_2[1]) ):
-            return -1
-        elif( float(tuple_1[1]) == float(tuple_2[1]) ):
-            return 0
-        else:
-            return 1
-
     tuple_list = []
     for key in list(hash.keys()):
         tuple = (key, len(hash[key]))
         tuple_list.append(tuple)
 
-    tuple_list.sort(compare)
+    tuple_list.sort(key=lambda x: float(x[1]))
 
     first_item_list = []
     for item in tuple_list:
@@ -618,10 +600,7 @@ def doc_id2corpus_id(a_doc_id):
 
 def get_max(a_list):
     """ The maximum value in a list of int strings """
-    def compare(a, b):
-        return cmp(int(a), int(b))
-
-    a_list.sort(compare)
+    a_list.sort(key=lambda x: int(x))
 
     return a_list[-1]
 
@@ -727,25 +706,10 @@ def quick_clean(s):
     return "".join([c if ord(c) < 128 else '%' for c in s])
 
 
-def compare_coref_tuple(a_tuple, b_tuple):
+def coref_tuple_cmp_key(a_tuple):
     a_start = int(a_tuple[-2])
     a_end = int(a_tuple[-1])
-
-    b_start = int(b_tuple[-2])
-    b_end = int(b_tuple[-1])
-
-    if( a_start < b_start ):
-        return -1
-    elif(a_start == b_start):
-        if( a_end < b_end ):
-            return -1
-        elif(a_end == b_end):
-            return 0
-        elif(a_end > b_end):
-            return 1
-    elif(a_start > b_start):
-        return 1
-
+    return (a_start, a_end)
 
 
 
@@ -864,17 +828,15 @@ def desubtokenize_annotations(a_string, add_offset_notations=False, delete_annot
             print(y)
     assert not token_stack, token_stack
 
-    def table_sorter(a, b):
+
+    def table_cmp_key(a):
         (a_o_tag, a_o_t_idx, a_o_s_off), (a_c_tag, a_c_t_idx, a_c_s_off) = a
-        (b_o_tag, b_o_t_idx, b_o_s_off), (b_c_tag, b_c_t_idx, b_c_s_off) = b
+        # if one start on a later token, do it first
+        # if one ends on an earlier token, do it first
+        # if one ends on an eralier character, do it first
+        return (-a_o_t_idx, a_c_t_idx, a_c_s_off)
 
-        if a_o_t_idx != b_o_t_idx:
-            return cmp(b_o_t_idx, a_o_t_idx) # if one start on a later token, do it first
-        if a_c_t_idx != b_c_t_idx:
-            return cmp(a_c_t_idx, b_c_t_idx) # if one ends on an earlier token, do it first
-        return cmp(a_c_s_off, b_c_s_off)     # if one ends on an eralier character, do it first
-
-    token_table.sort(cmp=table_sorter)
+    token_table.sort(key=table_cmp_key)
 
     def add_s_off(tag, s_off):
         if s_off == 0:
@@ -1059,7 +1021,7 @@ def apf2muc(in_file_name, out_file_name, source_file_name, new, chinese,
 
         total_mentions = total_mentions + len(mentions)
 
-    coref_tuple.sort(compare_coref_tuple)
+    coref_tuple.sort(key=coref_tuple_cmp_key)
 
     for a_tuple in coref_tuple:
         a_start = a_tuple[-2]
@@ -3123,13 +3085,7 @@ def normalize_html_entities(s):
 
 
 def two_int_tuple_compare(tuple_1, tuple_2):
-    if( float(tuple_1[0]) < float(tuple_2[0]) ):
-        return -1
-    elif( float(tuple_1[0]) == float(tuple_2[0]) ):
-        return cmp(float(tuple_1[1]), float(tuple_2[1]))
-    else:
-        return 1
-    
+    raise NotImplemented
 
 def arabic_pos2penn_pos(arabic_pos):
     if arabic_pos == 'NOUN_QUANT+CASE_DEF_ACC': return 'NN' 

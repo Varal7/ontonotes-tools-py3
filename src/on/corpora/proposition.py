@@ -2387,10 +2387,10 @@ class proposition(object):
 
                 #FIXME: temporarily commenting this.
                 #assert len(a_argument) == 1 # we decided to punt on cases with both , and *
-                
 
 
-                
+
+
                 a_argument_node = a_argument[0]
                 arg_nodes.append(a_argument_node)
 
@@ -2462,16 +2462,13 @@ class proposition(object):
 
 
 
-        def node_compare(node_one, node_two):
-            return cmp(int(node_one.split(":")[0]), int(node_two.split(":")[0]))
-
 
         def unique_reorder_enc_arg(enc_arg):
             # sort the nodes
             #print "in:", enc_arg
             left, right = enc_arg.split("-", 1)
             nodes = list(set(left.split("*")))
-            nodes.sort(node_compare)
+            nodes.sort(key=lambda node: node.split(":")[0])
 
             enc_arg = "%s-%s" % ("*".join(nodes), right)
             #print left, nodes, right, enc_arg
