@@ -95,8 +95,7 @@ import string
 import sys
 import re
 import getopt
-import UserDict
-
+from collections import MutableMapping as DictMixin
 
 #---- xml specific imports ----#
 from xml.etree import ElementTree
@@ -425,7 +424,7 @@ class abstract_bank(object):
 
 
 
-class subcorpus(UserDict.DictMixin):
+class subcorpus(DictMixin):
     """A subcorpus represents an arbitrary collection of documents.
 
     Initializing
@@ -955,6 +954,13 @@ class subcorpus(UserDict.DictMixin):
 
     def __len__(self):
         return len(self.banks)
+
+    def __iter__(self):
+        for bank in self.banks:
+            yield bank
+
+    def __delitem__(self, key):
+        del self.banks[key]
 
     def __getitem__(self, key):
         """ The standard way to access individual banks is with [] notation.
@@ -2054,9 +2060,9 @@ class tree_alignable_sgml_span(object):
 
             # don't generate this report if we're on dummy trees
             not all(a_leaf.tag == "XX" for a_leaf in a_tree)):
-            
+
             def report_alignment_failed(subreason):
-                
+
                 on.common.log.report(self.__sgml_span_name, "alignment failed %s" % subreason, document_id=a_tree.document_id, tree_string=a_tree.get_word_string(),
                                      tokens=initial_string_tokens, tokens_b=" ".join(str(t) for t in initial_string_tokens),
                                      tree_string_bkw_unv = a_tree.get_word_string(buckwalter=True, vocalized=False))
