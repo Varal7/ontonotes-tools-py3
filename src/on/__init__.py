@@ -78,7 +78,6 @@ import os.path
 import string
 import sys
 import re
-import exceptions
 import math
 import os
 import time

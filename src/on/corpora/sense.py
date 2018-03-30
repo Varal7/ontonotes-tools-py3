@@ -177,7 +177,6 @@ except ImportError:
 import string
 import sys
 import re
-import exceptions
 import codecs
 
 #---- xml specific imports ----#

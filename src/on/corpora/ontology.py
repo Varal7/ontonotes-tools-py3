@@ -86,7 +86,6 @@ except ImportError:
 import string
 import sys
 import re
-import exceptions
 import codecs
 
 
@@ -632,7 +631,7 @@ default character set utf8;
 
 
 
-class no_such_parent_concept_error(exceptions.Exception):
+class no_such_parent_concept_error(Exception):
     pass
 
 
@@ -643,7 +642,7 @@ class no_such_parent_concept_error(exceptions.Exception):
 
 
 
-class no_such_parent_sense_pool_error(exceptions.Exception):
+class no_such_parent_sense_pool_error(Exception):
     pass
 
 

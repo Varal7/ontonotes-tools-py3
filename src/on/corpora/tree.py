@@ -103,7 +103,6 @@ except ImportError:
 import string
 import sys
 import re
-import exceptions
 import codecs
 import subprocess
 import tempfile
